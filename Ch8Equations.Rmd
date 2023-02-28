@@ -1,0 +1,204 @@
+---
+title: "Cluster Sampling Equation Functions"
+subtitle: "Elementary Survey Sampling, Chapter 8"
+author: "Samuel Richards"
+date: "2023-02-27"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    code_folding: hide
+    number_sections: no
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+@scheaffer2011elementary
+
+## Notation
+*Slide 12 for reference*  
+(@scheaffer2011elementary[p.255])
+
+$$
+\begin{eqnarray}
+N &-& \text{ number of clusters in the population} \\
+n &-& \text{ number of clusters in a SRS} \\
+m_i &-& \text{  number of elements in cluster } i \\
+\bar{m} &=& \frac{1}{n} \sum_{i=1}^n m_i \text{ average cluster size for the sample} \\
+M &=& \sum_{i=1}^N m_i \text{ number of elements in the population} \\
+\bar{M} &=& \frac{M}{N} \text{ average cluster size for the population} \\
+y_i &-& \text{ total of all observations in the } i^{th} \text{ cluster}\\
+\end{eqnarray}
+$$
+
+
+## Population mean
+*Slide 13 for reference*  
+(@scheaffer2011elementary[p.255])
+
+Estimator for the population mean $\mu$:
+$$
+\bar{y} = \frac{\sum_{i=1}^n y_i}{\sum_{i=1}^n m_i}
+$$
+
+Estimated variance of $\bar{y}$:
+$$
+\hat{V}(\bar{y}) = \left( \frac{N-n}{N n \bar{M}^2} \right) s_r^2 \\
+\text{where} \\
+s_r^2 = \frac{\sum_{i=1}^n (y_i - \bar{y} m_i)^2}{n-1}
+$$
+*Note:* If $\bar{M}$ is unknown, it can be approximated by $\bar{m}$.
+
+
+### R function:
+
+This function takes 
+```{r}
+
+```
+
+
+
+## Population total
+*Slide 21 for reference*  
+(@scheaffer2011elementary[p.258])
+
+Estimator for the population mean $\tau$:
+$$
+M\bar{y} = M \left( \frac{\sum_{i=1}^n y_i}{\sum_{i=1}^n m_i} \right)
+$$
+
+Estimated variance of $M\bar{y}$:
+$$
+\hat{V}(M\bar{y}) = M^2\hat{V}(\bar{y}) = N^2 \left( \frac{N-n}{Nn} \right) s_r^2 \\
+\text{where} \\
+s_r^2 = \frac{\sum_{i=1}^n (y_i - \bar{y} m_i)^2}{n-1}
+$$
+
+
+### R function:
+
+This function takes 
+```{r}
+
+```
+
+
+
+## Population total (M unknown)
+*Slide 25 for reference*  
+(@scheaffer2011elementary[p.259])
+
+$$
+N\bar{y_t} = \frac{N}{n} \sum_{i=1}^n y_i \text{ where } \bar{y_t} = \frac{\sum_{i=1}^n y_i}{n} 
+$$
+
+Estimated variance of $N\bar{y_t}$:
+$$
+\hat{V} (N\bar{y_t}) = N^2\hat{V}(\bar{y_t}) = N^2 \left( \frac{N-n}{Nn} \right) s_t^2 \\
+\text{where} \\
+s_t^2 = \frac{\sum_{i=1}^n (y_i - \bar{y_t})^2}{n-1}
+$$
+
+
+### R function:
+
+This function takes 
+```{r}
+
+```
+
+
+
+<!-- The following are not in the lecture notes but indeed are in the textbook -->
+
+## Approximate sample size required to estimate population mean
+
+**(8.12)**
+(@scheaffer2011elementary[p.265])
+
+
+Approximate sample size required to estimate $\mu$, with a bound $B$ on the error of estimation:
+$$
+n = \frac{N\sigma^2_r}{ND + \sigma^2_r} \\
+\sigma^2_r \text{ is estimated by } s_r^2 \\
+D = \frac{B^2\bar{M}^2}{4}
+$$
+
+## Approximate sample size required to estimate population total
+
+**(8.13)**
+(@scheaffer2011elementary[p.266])
+
+Approximate sample size required to estimate $\tau$, using $M\bar{y}$, with a bound $B$ on the error of estimation:
+$$
+n = \frac{N\sigma^2_r}{ND + \sigma^2_r} \\
+\sigma^2_r \text{ is estimated by } s_r^2 \\
+D = \frac{B^2}{4N^2}
+$$
+
+(Note that the only difference between **(8.12)** and **(8.13)** is **D**.)
+
+
+## Approximate sample size required to estimate population total (without M)
+
+**(8.15)**
+(@scheaffer2011elementary[p.267])
+
+Approximate sample size required to estimate $\tau$, using $N\bar{y_t}$, with a bound $B$ on the error of estimation:
+$$
+n = \frac{N\sigma^2_t}{ND + \sigma^2_t} \\
+\sigma^2_t \text{ is estimated by } s_t^2 \\
+D = \frac{B^2}{4N^2}
+$$
+
+
+## Population proportion
+
+**(8.16)**, **(8.17)**, **(8.18)**
+(@scheaffer2011elementary[p.268])
+
+Estimator for the population proportion $p$:
+$$
+\hat{p} = \frac{\sum_{i=1}^n a_i}{\sum_{i=1}^n m_i}
+$$
+
+Estimated variance of $\hat{p}$:
+$$
+\hat{V}(\hat{p}) = \left( \frac{N-n}{N n \bar{M}^2} \right) s_p^2 \\
+\text{where} \\
+s_p^2 = \frac{\sum_{i=1}^n (a_i - \hat{p} m_i)^2}{n-1}
+$$
+
+## Probabilities proportional to size
+
+**(8.19)**, **(8.20)**, **(8.21)**, **(8.22)**
+(@scheaffer2011elementary[p.275])
+
+Estimator of the population mean $\mu$:
+$$
+\hat{u}_{pps} = \bar{\bar{y}} = \frac{1}{n}\sum_{i=1}^n \bar{y_i}
+$$
+
+Estimator for the variance of $\hat{u}_{pps}$:
+$$
+\hat{V}(\hat{u}_{pps}) = \frac{1}{n(n-1)} \sum_{i=1}^n (\bar{y_i} - \hat{u}_{pps})^2
+$$
+
+Estimator of the population total $\tau$:
+$$
+\hat{\tau}_{pps} = \frac{M}{n}\sum_{i=1}^n \bar{y_i}
+$$
+
+Estimator for the variance of $\hat{\tau}_{pps}$:
+$$
+\hat{V}(\hat{\tau}_{pps}) = \frac{M^2}{n(n-1)} \sum_{i=1}^n (\bar{y_i} - \hat{u}_{pps})^2
+$$
+
+
+
+
+

@@ -1,0 +1,528 @@
+---
+title: "Stratfied Sampling Equation Functions"
+subtitle: "Elementary Survey Sampling, Chapter 5"
+author: "Samuel Richards"
+date: "2023-02-17"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    code_folding: hide
+    number_sections: no
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r eval=FALSE, include=FALSE}
+
+#Data to (possibly) test all functions?
+
+TrackI <- c(80,92,68,85,72,87,85,91,90,81,62,79,61,83)
+TrackII <- c(85,82,48,75,53,73,65,78,49,69,72,81,53,59,68,52,71,61,59,42)
+TrackIII <- c(42,32,36,31,65,29,43,19,53,14,61,31,42,30,39,32)
+max_ln <- max(length(TrackI),length(TrackII),length(TrackIII))
+
+data <- data.frame(col1 = c(TrackI,rep(NA, max_ln - length(TrackI))),
+                   col2 = c(TrackII,rep(NA, max_ln - length(TrackII))),
+                   col3 = c(TrackIII,rep(NA, max_ln - length(TrackIII))) )
+
+N_i <- c(55,80,65)
+n_i <- c(14,20,16)
+y_i <- colMeans(data, na.rm = TRUE)  #returns means for each Track
+s2_i <- apply(data,2,var, na.rm=TRUE)  #returns variance for each Track
+
+
+#ybar_with_errorbounds(N_i,n_i,y_i,s2_i)
+```
+
+
+## Estimator for population mean
+
+**(5.1)**,**(5.2)**
+(@scheaffer2011elementary[p.119])
+
+Estimator for population mean $\mu$:
+$$
+\bar{y}_{st} = \frac{1}{N}\sum_{i=1}^LN_i\bar{y}_i
+$$
+
+Estimator of variance of $\bar{y}_{st}$
+$$
+\hat{V}(\bar{y}_{st}) = \frac{1}{N^2}\sum_{i=1}^L \left[ N^2_i \left( \frac{N_i-n_i}{N_i} \right) \left( \frac{s^2_i}{n_i} \right) \right]
+$$
+
+### R function:
+
+This function takes *(as vectors for each strata*) the **strata sizes** ($N_i$), **sample sizes** ($n_i$), **means** ($\bar{y}_i$), and **variances** ($s^2_i$).  It outputs the estimator for the population mean, the variance of the estimator, the margin of error, and the bounds on the error of estimation.
+
+```{r}
+# N_i <- population sizes of each strata
+# n_i <- sample sizes of each strata
+# y_i <- mean of each strata sample
+# s2_i <- apply(data,2,var, na.rm=TRUE)  #returns variance for each Track
+
+ybar_with_errorbounds <- function(N_i,n_i,y_i,s2_i){
+  N <- sum(N_i)                   #total sample size calculated by summation of strata sizes
+  y_st <- sum(N_i*y_i)/N          #calculation for the estimator of mu
+  Vy_st <- sum(N_i^2*((N_i-n_i)/N_i)*(s2_i/n_i))/N^2    #calculation for the variance of the estimator
+  B <- 2*sqrt(Vy_st)              #calculation for the margin of error
+  bounds <- y_st+c(-B,B)          #calculation for the error bounds
+  
+  ybar_and_bounds <- list("Estimator for mean (y_st)" = y_st,
+                "Variance of the estimator (V(y_st))" = Vy_st, 
+                "Margin of Error (B)" = B,
+                "Bounds on the error of Estimation" = bounds)
+  return(ybar_and_bounds)
+}
+
+```
+
+
+## Estimator for population total
+
+**(5.3)**,**(5.4)**
+(@scheaffer2011elementary[p.122])
+
+Estimator for population total $\tau$:
+$$
+N\bar{y}_{st} = \sum_{i=1}^L N_i \bar{y}_i
+$$
+
+Estimator for the variance of $\tau$:
+$$
+N^2 \hat{V}(\bar{y}_{st}) = \sum_{i=1}^L N_i^2 \left ( \frac{N_i-n_i}{N_i} \right ) \left ( \frac{s_i^2}{n_i} \right )
+$$
+
+### R function:
+
+This function takes the **strata sizes** ($N_i$), **sample sizes** ($n_i$), **means** ($\bar{y}_i$), and estimated **variances** ($s^2_i$).  It outputs the estimator for the population total $\tau$, the variance of the estimator, the margin of error, and the bounds on the error of estimation.
+
+```{r}
+# N_i <- sizes for each strata
+# n_i <- sample sizes of each strata
+# y_i <- mean of each strata sample
+# s2_i <- estimates variance of each strata
+
+tauhat <- function(N_i, n_i, y_i, s2_i){
+  N <- sum(N_i)
+  
+  Ny_st <- sum(N_i*y_i)           #tau: strata size multiplied by strata mean
+  
+  N2Vy_st <- sum( N_i^2 * ((N_i-n_i)/N_i) * (s2_i/n_i) )  #variance of tau
+  
+  B <- 2*sqrt(N2Vy_st)              #calculation for the margin of error
+  bounds <- Ny_st+c(-B,B)         #calculation for the error bounds
+  
+  tauhat_and_bounds <- list("Estimator tau, the population total (Ny_st)" = Ny_st,
+                "Variance of the estimator (N2Vy_st)" = N2Vy_st, 
+                "Margin of Error (B)" = B,
+                "Bounds on the error of Estimation" = bounds)
+  return(tauhat_and_bounds)
+}
+
+```
+
+```{r eval=FALSE, include=FALSE}
+
+#simulation study
+
+N_i <- c(55,80,65)
+n_i <- c(14,20,16)
+y_i <- colMeans(data, na.rm = TRUE)  #returns means for each Track
+s2_i <- apply(data,2,var, na.rm=TRUE)  #returns variance for each Track
+
+tauhat(N_i, n_i, y_i, s2_i)
+
+N <- sum(N_i)               #total of all strata
+y_st <- sum(N_i*y_i)/N      #estimator for the mean
+N*y_st                      #population total tau = N*population mean
+
+sum( N_i^2 * ((N_i-n_i)/N_i) * (s2_i/n_i) ) #variance of tau
+```
+
+
+
+## Approximate Sample size with a fixed Bound
+
+**(5.6)**
+(@scheaffer2011elementary[p.124])
+
+Approximate **sample size** $n$ required to estimate $\mu$ or $\tau$ with a bound $B$ on the error of estimation:
+$$
+n = \frac{\sum_{i=1}^L N_i^2 \sigma^2_i/a_i}{N^2 D + \sum_{i=1}^L N_i \sigma^2_i} \\
+D = \frac{B^2}{4} \text{ when estimating } \mu \\
+D = \frac{B^2}{4N^2} \text{ when estimating } \tau \\
+$$
+
+
+### R function:
+
+This function takes the **strata sizes** ($N_i$), estimated **variances** ($s^2_i$), **allocation proportion** ($a_i$, the proportion of the $i^{th}$ strata), and the **margin of error** ($B$).  It also requires that the parameter `param` is set to either $\mu$ or $\tau$ (`"mu"` or `"tau"`).  It outputs the estimator for the total sample size and allocation for each strata.
+
+```{r}
+# N_i <- sizes for each strata
+# s2_i <- estimates variance of each strata
+# a_i <- fraction of each strata allocated to the sample
+# B <- bounds on the error of estimation
+# param <- "mu" or "tau;" determines calculation of D
+
+ssfb <- function(N_i,s2_i,a_i,B,param="mu"){   #param either "mu" or "tau"
+  
+  N <- sum(N_i)                       #total sample size calculated by summation of strata sizes
+  
+  if (param=="mu"){      #activated when we are estimating mu
+    D <- B^2/4
+  }
+  if (param=="tau"){     #activated when we are estimating tau
+    D <- B^2/(4*N^2)
+  }
+  
+  n <- sum(N_i^2*s2_i/a_i) /  #sample size approximation
+      (N^2*D+sum(N_i*s2_i))
+  
+  ssfb <- list("Sample size" = n)
+  return(ssfb)
+}
+
+
+#code to test:
+#N_i <- c(97,43,145,68)
+#s2_i <- c(.9,.9,.5,.5)*(1-c(.9,.9,.5,.5)) irrelevant because this was used as a proportion
+#B <- .05
+#a_i <- N_i/sum(N_i)
+
+#ssfb(N_i,s2_i,a_i,B,param="mu")
+
+```
+
+
+## Optimal Allocation of the Sample
+
+**(5.7)**
+(@scheaffer2011elementary[p.126])
+
+Approximate sample allocation that minimizes cost for a fixed error or minimizes error for a fixed cost:
+$$
+n = \frac{\left( \sum_{i=1}^L N_i \sigma_i / \sqrt{c_i} \right) \left( \sum_{i=1}^L N_k \sigma_k \sqrt{c_k} \right)}
+{N^2D + \sum_{i=1}^L N_i \sigma_i^2} \\
+\text{ }\\
+n_i = n \left( \frac{N_i \sigma_i / \sqrt{c_i}}
+    {\sum_{i=1}^L N_k \sigma_k / \sqrt{c_k}} \right)
+$$
+
+
+### R function:
+(Untested)
+
+This function takes the **strata sizes** ($N_i$), estimated **variances** ($s^2_i$), **costs** ($c_i$), and the **margin of error** ($B$).  It also requires that the parameter `param` is set to either $\mu$ or $\tau$ (`"mu"` or `"tau"`).  It outputs the estimator for the total sample size and allocation for each strata.
+
+```{r}
+# N_i <- sizes for each strata
+# s2_i <- estimates variance of each strata
+# c_i <- costs for each strata
+# B <- bounds on the error of estimation
+# param <- "mu" or "tau;" determines calculation of D
+
+opt_alloc <- function(N_i,s2_i,c_i,B,param="mu"){
+  
+  if (param=="mu"){      #activated when we are estimating mu
+    D <- B^2/4
+  }
+  if (param=="tau"){     #activated when we are estimating tau
+    D <- B^2/(4*N^2)
+  }
+  
+  N <- sum(N_i)
+  s_i <- sqrt(s2_i)
+  
+  n <- sum(N_i*s_i/sqrt(c_i)) * sum(N_i*s_i*sqrt(c_i)) /    #sample size
+      (N^2*D + sum(N_i*s2_i))
+  
+  n_i <- n*(N_i*s_i/sqrt(c_i) /         #allocation
+        sum(N_i*s_i/sqrt(c_i))  )
+  
+  opall <- list("Sample size" = n,
+                "allocation" = n_i)
+  return(opall)
+}
+```
+
+
+
+## Neyman Allocation
+
+**(5.10)**
+(@scheaffer2011elementary[p.128])
+
+This is the simplified formula for optimal allocation in which **all costs are equal.**
+
+$$
+n = \frac{\left( \sum_{k=1}^L N_k \sigma_k \right)^2}{N^2D + \sum_{i=1}^L N_i \sigma^2_i} \\
+\text{ }\\
+n_i = n \left( \frac{N_i \sigma_i}{\sum_{k=1}^L N_k \sigma_k}  \right)
+$$
+
+
+### R function:
+
+This function takes the **strata sizes** ($N_i$) and **variances** ($s^2_i$).  It outputs the estimator for the total sample size and allocation for each strata.
+
+```{r}
+# N_i <- sizes for each strata
+# s2_i <- estimates variance of each strata
+# B <- bounds on the error of estimation
+# param <- "mu" or "tau;" determines calculation of D
+
+Neyman <- function(N_i,s2_i,B,param="mu"){
+    
+  if (param=="mu"){      #activated when we are estimating mu
+    D <- B^2/4
+  }
+  if (param=="tau"){     #activated when we are estimating tau
+    D <- B^2/(4*N^2)
+  }
+  
+  N <- sum(N_i)                 #total population size (N)
+  
+  n <- sum(N_i*sqrt(s2_i))^2/   #total sample size (n)
+    (N^2*D+sum(N_i*s2_i))
+
+  n_i <- n*(N_i*sqrt(s2_i))/sum(N_i*sqrt(s2_i))  #sample size for each strata (n_i)
+  
+  JN <- list("total sample size:" = n,
+             "sample size of each strata:" = n_i)
+  
+  return(JN)
+}
+```
+
+
+<!-- keep this but don't use for now
+
+Neyman allocation for when total sample size is known:  
+```{r eval=FALSE, include=FALSE}
+#Neyman function for when sample size is known
+
+# N_i <- sizes for each strata
+# s2_i <- estimates variance of each strata
+# n <- total sample size
+
+Neyman_n <- function(N_i,s2_i,n){
+  
+  N <- sum(N_i)                 #total population size (N)
+
+  n_i <- n*(N_i*sqrt(s2_i))/sum(N_i*sqrt(s2_i))  #sample size for each strata (n_i)
+  
+  JN <- list("total sample size:" = n,
+             "sample size of each strata:" = n_i)
+  
+  return(JN)
+}
+
+Neyman_n(N_i,s2_i,n)
+```
+
+```{r}
+# (Exercise 5.2 for reference)
+data3 <- read.csv("C:/Users/Samuel/OneDrive - West Chester University of PA/STA-514/Textbook Data/Ch 5/EXERCISE5_3.csv")
+
+N_i <- c(132,92,27)
+s2_i <- c(36,25,9)
+n <- 30
+```
+
+-->
+
+
+## Proportional Allocation
+
+**(5.11)**, **(5.12)**
+(@scheaffer2011elementary[p.131])
+
+This is the simplified formula for optimal allocation in which **all costs are equal** and **all strata variances are equal**.
+$$
+n_i = n \left( \frac{N_i}{N} \right) \\
+n = \frac{\sum_{i=1}^L N_i \sigma^2_i}{ND + \frac{1}{N} \sum_{i=1}^L N_i \sigma^2_i} \\
+$$
+
+### R function:
+
+(untested)
+
+```{r}
+# N_i <- sizes for each strata
+# s2_i <- estimates variance of each strata
+# B <- bounds on the error of estimation
+# param <- "mu" or "tau;" determines calculation of D
+
+propallocation <- function(N_i, s2_i,B,param="mu"){
+  
+  if (param=="mu"){      #activated when we are estimating mu
+    D <- B^2/4
+  }
+  if (param=="tau"){     #activated when we are estimating tau
+    D <- B^2/(4*N^2)
+  }
+  
+  N <- sum(N_i)             #total population size (N)
+  
+  n <- sum(N_i*s2_i) /      #total sample size
+      (N*D+sum(N_i*s2_i)/N) 
+  
+  n_i <- n*N_i/N            #sample size for each strata (n_i)
+  
+  prop <- list("total sample size:" = n,
+             "sample size of each strata:" = n_i)
+  
+  return(prop)
+}
+
+#propallocation(strata_sizes, strata_variances)
+#propallocation(N_i, s2_i)
+```
+
+
+## Estimator for population proportiom
+
+**(5.13)**,**(5.14)**
+(@scheaffer2011elementary[p.133])
+
+Estimator for population proportion $p$:
+$$
+\hat{p}_{st} = \frac{1}{N} \sum_{i=1}^L N_i \hat{p_i}
+$$
+
+Estimator for the variance of $\hat{p}_{st}$:
+$$
+\hat{V}(\hat{p}_{st}) = \frac{1}{N^2}\sum_{i=1}^L \left[ N^2_i \left( \frac{N_i-n_i}{N_i} \right) \left( \frac{\hat{p}_i\hat{q}_i}{n_i-1} \right) \right]
+$$
+
+### R function:
+
+This function takes the **strata proportions**, **strata sizes** ($N_i$), and **sample sizes** ($n_i$).  It outputs the estimator for the population mean, the variance of the estimator, the margin of error, and the bounds on the error of estimation.
+
+```{r}
+# p_i <- collected sample proportions for each strata
+# N_i <- population sizes of each strata
+# n_i <- sample sizes of each strata
+
+pop_prop <- function(p_i,N_i,n_i){
+  
+  N <- sum(N_i)                       #total sample size calculated by summation of strata sizes
+  q_i <- 1-p_i                        #inverse of p_i
+  
+  p_st <- sum(p_i*N_i)/N              #Estimator of the population proportion
+
+  Vp_st <- sum(N_i^2*                 #Estimator for the variance of p-hat_st
+            ((N_i-n_i)/N_i)*
+               (p_i*q_i/(n_i-1))) /   
+                  N^2
+
+  B <- 2*sqrt(Vp_st)                  #calculation for the margin of error
+  bounds <- p_st+c(-B,B)              #calculation for the error bounds
+  
+  pst_and_bounds <- list("Estimator for population proportion (p_st)" = p_st,
+                "Variance of the estimator (V(p_st))" = Vp_st, 
+                "Margin of Error (B)" = B,
+                "Bounds on the error of Estimation" = bounds)
+  return(pst_and_bounds)
+}
+```
+
+
+
+## Approximate Sample size with a fixed bound (for proportions)
+
+**(5.15)**
+(@scheaffer2011elementary[p.135])
+
+Approximate **sample size** $n$ required to estimate $p$ with a bound $B$ on the error of estimation:
+
+$$
+n = \frac{\sum_{i=1}^L N_i^2 p_iq_i/a_i}{N^2 D + \sum_{i=1}^L N_i p_iq_i} \\
+$$
+
+### R function:
+(untested)
+
+This function takes the **strata sizes** ($N_i$), **proportions** ($p_i$), **allocation proportions** ($a_i$, the proportion of the $i^{th}$ strata), and the **margin of error** ($B$).  It outputs the estimator for the total sample size <!-- and allocation for each strata -->.
+```{r}
+# N_i <- population sizes of each strata
+# p_i <- collected sample proportions for each strata
+# a_i <- fraction of each strata allocated to the sample
+# B <- bounds on the error of estimation
+
+ssfb_prop <- function(N_i,p_i,a_i,B){
+  
+  N <- sum(N_i)          #total sample size calculated by summation of strata sizes
+  q_i <- 1-p_i           #inverse of p_i
+  D <- B^2/4
+
+  n <- sum(N_i^2*p_i*q_i/a_i) /   #sample size approximation
+      (N^2*D+sum(N_i*p_i*q_i))
+  
+  ssfbp <- list("Sample size" = n)
+  return(ssfbp)
+}
+```
+
+
+## Approximate allocation for a fixed bound (for proportions)
+
+**(5.16)**
+(@scheaffer2011elementary[p.135])
+
+Approximate allocation that minimizes cost for a fixed value of $\hat{V}(\hat{p}_{st})$ or minimizes $\hat{V}(\hat{p}_{st})$ for a fixed cost:
+$$
+n_i = n \left( \frac{N_i\sqrt{\hat{p}_i \hat{q}_i/c_i}}{\sum_{k=1}^L N_k \sqrt{\hat{p}_k \hat{q}_k/c_k}} \right)
+$$
+
+### R function:
+(Untested)
+
+This function takes the **strata sizes** ($N_i$), **proportions** ($p_i$), **costs** ($c_i$), the **margin of error** ($B$), and the **sample size** (derived from Eq. (5.15).  It outputs the allocation for each strata.
+
+```{r}
+# N_i <- population sizes of each strata
+# p_i <- collected sample proportions for each strata
+# c_i <- costs for each strata
+# B <- bounds on the error of estimation
+#n <- sample size (usually the output from Eq. (5.15))
+
+opt_alloc_p <- function(N_i,p_i,c_i,B,n){
+  
+  N <- sum(N_i)
+  q_i <- 1-p_i
+  D <- B^2/4  
+  
+  n_i <- (N_i*sqrt(p_i*q_i/c_i)) /    #allocation
+      sum(N_i*sqrt(p_i*q_i/c_i))
+  
+  opall_prop <- list("Sample size" = n,
+                "allocation" = n_i)
+  return(opall_prop)
+}
+```
+
+
+
+### Strata Allocations 
+
+Derived from **(5.16)**
+(@scheaffer2011elementary[p.136])
+
+To solve for the fraction of observations allocated to each stratum $a_i$, I used Eq. (5.16) from the textbook and $n_i = na_i$ to construct the equation below:  
+$$
+a_i = \frac{N_i\sqrt{\frac{\hat{p}_i \hat{q}_i}{c_i}}}{\sum_{k=1}^L N_k \sqrt{\frac{\hat{p}_k \hat{q}_k}{c_k}}}
+$$
+Formula in R
+```{r}
+# a_i <- N_i*sqrt(p_i*q_i/c_i)/sum(N_i*sqrt(p_i*q_i/c_i)) #formula from page 136 of text
+```
+
+
