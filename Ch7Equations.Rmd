@@ -1,0 +1,23 @@
+---
+title: "Systematic Sampling Equation Functions"
+subtitle: "Elementary Survey Sampling, Chapter 7"
+author: "Samuel Richards"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    code_folding: hide
+    number_sections: no
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+@scheaffer2011elementary
+
+## Notation
+
+
+
