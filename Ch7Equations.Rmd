@@ -17,7 +17,79 @@ knitr::opts_chunk$set(echo = TRUE)
 
 @scheaffer2011elementary
 
-## Notation
+## Estimator for population mean
+
+**(7.1)**,**(7.2)**
+(@scheaffer2011elementary[p.221])
+
+Estimator for population mean $\mu$:
+$$
+\hat{\mu} = \bar{y}_{sy} =  \frac{1}{n}\sum_{i=1}^n y_i
+$$
+Estimator of variance of $\bar{y}_{st}$
+$$
+\hat{V}(\bar{y}_{st}) = \left( 1-\frac{n}{N} \right) \frac{s^2}{n}
+$$
+assuming a randomly ordered population  
+
+Notice that this is the same estimator as used in a **Simple Random Sample**
+
+The true variance of $\bar{y}_{st}$ is given by Eq. **(7.4)**
+$$
+V(\bar{y}_{sy}) = \frac{\sigma^2}{n} [1+(n-1) \rho]
+$$
+
+Where $\rho$ is a measure of the correlation between pairs of observations in the same systematic sample.  It consists of the variability *within sample* over the variability *between samples*.  
+- characteristics of a systematic sample compared to that of the population
+$$
+\rho \approx \frac{MSB - MST}{(n-1)MST} \\
+$$
+**(7.16)**,**(7.17)**,**(7.18)**
+(@scheaffer2011elementary[p.235])
+$$
+MSB = \frac{n}{k-1} \sum_{i=1}^k (\bar{y}_i - \bar{\bar{y}}_i)^2 \\
+MSW = \frac{1}{k(n-1)} \sum_{i=1}^k \sum_{j=1}^n (y_{ij} - \bar{y}_i)^2 \\
+SST = \sum_{i=1}^k \sum_{j=1}^n (y_{ij} - \bar{\bar{y}})^2
+$$
+where $\bar{\bar{y}}$ is the overall mean per element.  here, Eq. **7.19** for $\rho$ is
+$$
+\rho = \frac{(k-1)nMSB - SST}{(n-1)SST}
+$$
 
 
 
+Systematic sampling uses the same estimators as simple random sampling because it is designed to be practically as random as a SRS, and a better estimate is not possible without taking multiple cluster samples.  As such, the remaining equations for population total, proportions, sample size, etc. are the same as in SRS and **can be found in Chapter 4**.
+
+## 1 in k sampling for mean
+
+**(7.12)**,**(7.13)**
+(@scheaffer2011elementary[p.233])
+
+Estimator for the population mean $\mu$ under $1 \text{ in } k'$ systematic sampling:
+$$
+\hat{\mu} = \sum_{i=1}^{n_s} \frac{\bar{y}_i}{n_s}
+$$
+$y_i$ is the mean of the $i^{th}$ systematic sample.  
+$n_s$ is the number in the sample.
+
+Estimated variance of $\hat{\mu}$:
+$$
+\hat{V}(\hat{\mu}) = \left(1- \frac{n}{N} \right) \frac{s^2_{\bar{y}}}{n_s} \\
+\text{where} \\
+s^2_{\bar{y}} = \frac{\sum_{i=1}^{n_s} (\bar{y_i} - \hat{\mu})^2}{n_s-1}
+$$
+
+## 1 in k sampling for total
+
+$1 \text{ in } k'$ systematic sampling can be used for population total, $\tau$, too
+
+**(7.14)**,**(7.15)**
+(@scheaffer2011elementary[p.233])
+$$
+\hat{\tau} = N\hat{\mu} = N \sum_{i=1}^{n_s} \frac{\bar{y}_i}{n_s}
+$$
+
+Estimated variance of $\hat{\tau}$:
+$$
+\hat{V}(\hat{\tau}) = N^2\hat{V}(\hat\mu) = N^2 \left(1- \frac{n}{N} \right) \frac{s^2_{\bar{y}}}{n_s} \\
+$$

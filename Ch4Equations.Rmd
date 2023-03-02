@@ -1,0 +1,107 @@
+---
+title: "Simple Random Sampling Equation Functions"
+subtitle: "Elementary Survey Sampling, Chapter 4"
+author: "Samuel Richards"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    code_folding: hide
+    number_sections: no
+bibliography: references.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+@scheaffer2011elementary
+
+## Estimator for population mean
+
+**(4.1)**,**(4.2)**
+(@scheaffer2011elementary[p.83])
+
+Estimator for population mean $\mu$:
+$$
+\hat{\mu} = \bar{y} =  \frac{1}{n}\sum_{i=1}^n y_i
+$$
+
+Estimator for the variance of $\bar{y}$
+$$
+\hat{V}(\bar{y}) = \left( 1-\frac{n}{N} \right) \frac{s^2}{n}
+$$
+
+
+## Estimator for population total
+
+**(4.4)**,**(4.5)**
+(@scheaffer2011elementary[p.87])
+
+Estimator for population total $\hat{\tau}$:
+$$
+\hat{\tau} = N\bar{y} =  \frac{N}{n}\sum_{i=1}^n y_i
+$$
+
+Estimator for the variance of $\tau$
+$$
+\hat{V}(\hat{\tau}) = \hat{V}(N\bar{y}) = N^2 \left( 1-\frac{n}{N} \right) \frac{s^2}{n}
+$$
+
+
+### A note on Bounds
+
+The estimator for the bound on the error of estimation is $2\sqrt{V(\hat\lambda)}$ where $V(\hat\lambda)$ is the variance of the estimator ($\mu$, $\tau$, $(\hat{p})$).  
+*(Notation deviates from the textbook)*  
+$2\sqrt{}$ is an approximated version of a t-test that the text uses to simplify calculation.
+
+
+## Sample size estimates for population mean and for population total
+
+**(4.11)**,**(4.13)**
+(@scheaffer2011elementary[p.88,90])
+
+Sample size required to estimate $\mu$ or $\tau$ with a bound on the error of estimation $B$.
+$$
+n = \frac{N\sigma^2}{(N-1)D + \sigma^2} \\
+\text{where} \\
+D = \frac{B}{4} \text{ for } \mu \text{ and} \\
+D = \frac{B^2}{4N^2} \text{ for } \tau
+$$
+
+
+## Estimator for population proportion
+
+**(4.14)**,**(4.15)**
+(@scheaffer2011elementary[p.91])
+
+Estimator for the population proportion $p$:
+$$
+\hat{p} = \bar{y} = \frac{\sum_{i=1}^n y_i}{n}
+$$
+
+Estimated variance of $\hat{p}$:
+$$
+\hat{V}(\hat{p}) = \left(1 - \frac{n}{N} \right) \frac{\hat{p} \hat{q}}{n-1} \\
+\text{where} \\
+\hat{q} = 1-\hat{p}
+$$
+
+
+## Sample size estimate for population proportion
+
+**(4.18)**
+(@scheaffer2011elementary[p.93])
+
+Similar to Eq. **(4.11)** or **(4.13)**, $\sigma^2$ si replaced with $pq$ in the sample size formula to estimate $p$ with a bound on the error of estimation $B$:
+$$
+n = \frac{Npq}{(N-1)D + pq} \\
+\text{where} \\
+D = \frac{B^2}{4N^2} \text{ for } \tau
+$$
+
+
+
+
+
+
