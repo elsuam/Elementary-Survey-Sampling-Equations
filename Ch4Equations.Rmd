@@ -6,7 +6,7 @@ output:
   html_document:
     toc: yes
     toc_float: yes
-    code_folding: hide
+    code_folding: show
     number_sections: no
 bibliography: references.bib
 ---
@@ -49,9 +49,69 @@ $$
 $$
 
 
+### Function in R for population mean or total
+
+```{r}
+# n <- sample size
+# y_i <- vector of observations
+# N <- population size (if known)
+
+pop_mean_or_total <- function(y_i, N, param){
+
+n <- length(y_i)  #sample size
+s2 <- var(y_i)    #sample variance
+
+#----------Estimator for mu----------
+  
+  if (param == 'mu'){
+    y_bar <- sum(y_i)/n   #population mean estimator
+    
+    Vy_bar <- (1-(n/N))*s2/n   #variance of the estimator
+
+    B <- 2*sqrt(Vy_bar)   #Margin of error
+    bounds <- y_bar + c(-B,B)   #Error bounds
+  
+#---return a list of parameter estimates---
+  ybar_and_bounds <- list("Estimator for mean (y_bar)" = y_bar,
+                "Variance of the estimator (V(y_bar))" = Vy_bar, 
+                "Margin of Error (B)" = B,
+                "Bounds on the error of Estimation" = bounds)
+  return(ybar_and_bounds)
+  }
+
+#----------Estimator for tau----------
+   
+  else if (param == 'tau'){
+    tau_bar <- N*sum(y_i)/n   #population total estimator
+    
+    Vtau_bar <- N^2*(1-(n/N))*s2/n   #variance of the estimator
+
+    B <- 2*sqrt(Vtau_bar)   #Margin of error
+    bounds <- tau_bar + c(-B,B)   #Error bounds
+
+#---return a list of parameter estimates---
+  taubar_and_bounds <- list("Estimator for total (tau_bar)" = tau_bar,
+                "Variance of the estimator (V(tau_bar))" = Vtau_bar, 
+                "Margin of Error (B)" = B,
+                "Bounds on the error of Estimation" = bounds)
+  return(taubar_and_bounds)
+  }
+
+}
+
+# Test:
+
+# y_i <- c(45,78,26,45,8,45,12,95,6,8,55)
+# N <- 100
+# pop_mean_or_total(y_i,N,param = "tau")
+# pop_mean_or_total(y_i,N,param = "mu")
+```
+
+
+
 ### A note on Bounds
 
-The estimator for the bound on the error of estimation is $2\sqrt{V(\hat\lambda)}$ where $V(\hat\lambda)$ is the variance of the estimator ($\mu$, $\tau$, $(\hat{p})$).  
+The estimator for the bound on the error of estimation is $2\sqrt{V(\hat\lambda)}$ where $V(\hat\lambda)$ is the variance of the estimator ($\hat\mu$, $\hat\tau$, or $\hat{p}$).  
 *(Notation deviates from the textbook)*  
 $2\sqrt{}$ is an approximated version of a t-test that the text uses to simplify calculation.
 
@@ -70,6 +130,35 @@ D = \frac{B^2}{4N^2} \text{ for } \tau
 $$
 
 
+### Fuction in R for sample size estimate
+
+```{r}
+# N <- population size
+# s2 <- variance, often pulled from pilot study or prior experimentation
+# B <- Desired margin of error
+
+srs_samplesize <- function(N, s2, B, param){
+  if(param == 'mu'){
+    D <- B/4
+  }
+  else if(param == 'tau'){
+    D <- B^2/(4*N^2)
+  }
+  
+  n <- N*s2 / ((N-1)*D+s2)
+  
+  return(list("Approximate sample size:" = n))
+}
+
+#Test:
+
+# N <- 1000
+# s2 <- 78.5
+# B <- 4
+# srs_samplesize(N, s2, B, param = 'mu')
+```
+
+
 ## Estimator for population proportion
 
 **(4.14)**,**(4.15)**
@@ -86,6 +175,44 @@ $$
 \text{where} \\
 \hat{q} = 1-\hat{p}
 $$
+
+### Function in R for population proportion
+
+```{r}
+# n <- sample size
+# y_i <- vector of observations (as proportions)
+# N <- population size (if known)
+
+srs_pop_proportion <- function(y_i, N){
+
+n <- length(y_i)  #sample size
+
+#----------Estimator for p_hat----------
+  
+    p_hat <- sum(y_i)/n   #population proportion estimator
+    
+    q <- 1-p_hat    #calculation for proportion compliments
+    
+    Vp_hat <- (1-(n/N))*p_hat*q/(n-1)   #variance of the estimator
+
+    B <- 2*sqrt(Vp_hat)   #Margin of error
+    bounds <- p_hat + c(-B,B)   #Error bounds
+  
+#---return a list of parameter estimates---
+  p_hat_and_bounds <- list("Estimator for population proportion (p_hat)" = p_hat,
+                "Variance of the estimator (Vp_hat)" = Vp_hat, 
+                "Margin of Error (B)" = B,
+                "Bounds on the error of Estimation" = bounds)
+  return(p_hat_and_bounds)
+
+}
+
+# Test:
+
+# y_i <- c(45,78,26,45,8,45,12,95,6,8,55)/100
+# N <- 100
+# srs_pop_proportion(y_i,N)
+```
 
 
 ## Sample size estimate for population proportion

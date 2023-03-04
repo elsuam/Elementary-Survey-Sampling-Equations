@@ -1623,10 +1623,66 @@ Functions</h1>
 \hat{V}(\hat{\tau}) = \hat{V}(N\bar{y}) = N^2 \left( 1-\frac{n}{N}
 \right) \frac{s^2}{n}
 \]</span></p>
+<div id="function-in-r-for-population-mean-or-total" class="section level3">
+<h3>Function in R for population mean or total</h3>
+<pre class="r"><code># n &lt;- sample size
+# y_i &lt;- vector of observations
+# N &lt;- population size (if known)
+
+pop_mean_or_total &lt;- function(y_i, N, param){
+
+n &lt;- length(y_i)  #sample size
+s2 &lt;- var(y_i)    #sample variance
+
+#----------Estimator for mu----------
+  
+  if (param == &#39;mu&#39;){
+    y_bar &lt;- sum(y_i)/n   #population mean estimator
+    
+    Vy_bar &lt;- (1-(n/N))*s2/n   #variance of the estimator
+
+    B &lt;- 2*sqrt(Vy_bar)   #Margin of error
+    bounds &lt;- y_bar + c(-B,B)   #Error bounds
+  
+#---return a list of parameter estimates---
+  ybar_and_bounds &lt;- list(&quot;Estimator for mean (y_bar)&quot; = y_bar,
+                &quot;Variance of the estimator (V(y_bar))&quot; = Vy_bar, 
+                &quot;Margin of Error (B)&quot; = B,
+                &quot;Bounds on the error of Estimation&quot; = bounds)
+  return(ybar_and_bounds)
+  }
+
+#----------Estimator for tau----------
+   
+  else if (param == &#39;tau&#39;){
+    tau_bar &lt;- N*sum(y_i)/n   #population total estimator
+    
+    Vtau_bar &lt;- N^2*(1-(n/N))*s2/n   #variance of the estimator
+
+    B &lt;- 2*sqrt(Vtau_bar)   #Margin of error
+    bounds &lt;- tau_bar + c(-B,B)   #Error bounds
+
+#---return a list of parameter estimates---
+  taubar_and_bounds &lt;- list(&quot;Estimator for total (tau_bar)&quot; = tau_bar,
+                &quot;Variance of the estimator (V(tau_bar))&quot; = Vtau_bar, 
+                &quot;Margin of Error (B)&quot; = B,
+                &quot;Bounds on the error of Estimation&quot; = bounds)
+  return(taubar_and_bounds)
+  }
+
+}
+
+# Test:
+
+# y_i &lt;- c(45,78,26,45,8,45,12,95,6,8,55)
+# N &lt;- 100
+# pop_mean_or_total(y_i,N,param = &quot;tau&quot;)
+# pop_mean_or_total(y_i,N,param = &quot;mu&quot;)</code></pre>
+</div>
 <div id="a-note-on-bounds" class="section level3">
 <h3>A note on Bounds</h3>
 <p>The estimator for the bound on the error of estimation is <span class="math inline">\(2\sqrt{V(\hat\lambda)}\)</span> where <span class="math inline">\(V(\hat\lambda)\)</span> is the variance of the
-estimator (<span class="math inline">\(\mu\)</span>, <span class="math inline">\(\tau\)</span>, <span class="math inline">\((\hat{p})\)</span>).<br />
+estimator (<span class="math inline">\(\hat\mu\)</span>, <span class="math inline">\(\hat\tau\)</span>, or <span class="math inline">\(\hat{p}\)</span>).<br />
 <em>(Notation deviates from the textbook)</em><br />
 <span class="math inline">\(2\sqrt{}\)</span> is an approximated version
 of a t-test that the text uses to simplify calculation.</p>
@@ -1643,6 +1699,32 @@ n = \frac{N\sigma^2}{(N-1)D + \sigma^2} \\
 D = \frac{B}{4} \text{ for } \mu \text{ and} \\
 D = \frac{B^2}{4N^2} \text{ for } \tau
 \]</span></p>
+<div id="fuction-in-r-for-sample-size-estimate" class="section level3">
+<h3>Fuction in R for sample size estimate</h3>
+<pre class="r"><code># N &lt;- population size
+# s2 &lt;- variance, often pulled from pilot study or prior experimentation
+# B &lt;- Desired margin of error
+
+srs_samplesize &lt;- function(N, s2, B, param){
+  if(param == &#39;mu&#39;){
+    D &lt;- B/4
+  }
+  else if(param == &#39;tau&#39;){
+    D &lt;- B^2/(4*N^2)
+  }
+  
+  n &lt;- N*s2 / ((N-1)*D+s2)
+  
+  return(list(&quot;Approximate sample size:&quot; = n))
+}
+
+#Test:
+
+# N &lt;- 1000
+# s2 &lt;- 78.5
+# B &lt;- 4
+# srs_samplesize(N, s2, B, param = &#39;mu&#39;)</code></pre>
+</div>
 </div>
 <div id="estimator-for-population-proportion" class="section level2">
 <h2>Estimator for population proportion</h2>
@@ -1657,6 +1739,42 @@ D = \frac{B^2}{4N^2} \text{ for } \tau
 \text{where} \\
 \hat{q} = 1-\hat{p}
 \]</span></p>
+<div id="function-in-r-for-population-proportion" class="section level3">
+<h3>Function in R for population proportion</h3>
+<pre class="r"><code># n &lt;- sample size
+# y_i &lt;- vector of observations (as proportions)
+# N &lt;- population size (if known)
+
+srs_pop_proportion &lt;- function(y_i, N){
+
+n &lt;- length(y_i)  #sample size
+
+#----------Estimator for p_hat----------
+  
+    p_hat &lt;- sum(y_i)/n   #population proportion estimator
+    
+    q &lt;- 1-p_hat    #calculation for proportion compliments
+    
+    Vp_hat &lt;- (1-(n/N))*p_hat*q/(n-1)   #variance of the estimator
+
+    B &lt;- 2*sqrt(Vp_hat)   #Margin of error
+    bounds &lt;- p_hat + c(-B,B)   #Error bounds
+  
+#---return a list of parameter estimates---
+  p_hat_and_bounds &lt;- list(&quot;Estimator for population proportion (p_hat)&quot; = p_hat,
+                &quot;Variance of the estimator (Vp_hat)&quot; = Vp_hat, 
+                &quot;Margin of Error (B)&quot; = B,
+                &quot;Bounds on the error of Estimation&quot; = bounds)
+  return(p_hat_and_bounds)
+
+}
+
+# Test:
+
+# y_i &lt;- c(45,78,26,45,8,45,12,95,6,8,55)/100
+# N &lt;- 100
+# srs_pop_proportion(y_i,N)</code></pre>
+</div>
 </div>
 <div id="sample-size-estimate-for-population-proportion" class="section level2">
 <h2>Sample size estimate for population proportion</h2>
@@ -1715,7 +1833,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
+  window.initializeCodeFolding("show" === "show");
 });
 </script>
 
