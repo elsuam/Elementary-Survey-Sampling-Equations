@@ -125,7 +125,7 @@ Sample size required to estimate $\mu$ or $\tau$ with a bound on the error of es
 $$
 n = \frac{N\sigma^2}{(N-1)D + \sigma^2} \\
 \text{where} \\
-D = \frac{B}{4} \text{ for } \mu \text{ and} \\
+D = \frac{B^2}{4} \text{ for } \mu \text{ and} \\
 D = \frac{B^2}{4N^2} \text{ for } \tau
 $$
 
@@ -224,7 +224,7 @@ Similar to Eq. **(4.11)** or **(4.13)**, $\sigma^2$ si replaced with $pq$ in the
 $$
 n = \frac{Npq}{(N-1)D + pq} \\
 \text{where} \\
-D = \frac{B^2}{4N^2} \text{ for } \tau
+D = \frac{B^2}{4}
 $$
 
 

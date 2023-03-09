@@ -1696,7 +1696,7 @@ total</h2>
 estimation <span class="math inline">\(B\)</span>. <span class="math display">\[
 n = \frac{N\sigma^2}{(N-1)D + \sigma^2} \\
 \text{where} \\
-D = \frac{B}{4} \text{ for } \mu \text{ and} \\
+D = \frac{B^2}{4} \text{ for } \mu \text{ and} \\
 D = \frac{B^2}{4N^2} \text{ for } \tau
 \]</span></p>
 <div id="fuction-in-r-for-sample-size-estimate" class="section level3">
@@ -1786,7 +1786,7 @@ n &lt;- length(y_i)  #sample size
 estimation <span class="math inline">\(B\)</span>: <span class="math display">\[
 n = \frac{Npq}{(N-1)D + pq} \\
 \text{where} \\
-D = \frac{B^2}{4N^2} \text{ for } \tau
+D = \frac{B^2}{4}
 \]</span></p>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-scheaffer2011elementary" class="csl-entry">
